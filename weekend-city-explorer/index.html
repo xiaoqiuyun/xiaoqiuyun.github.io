@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0e1115" />
+  <meta name="description" content="周末城市探索指南：根据天气、预算和兴趣，发现今天值得出发的城市活动。" />
+  <title>周末城市探索指南 · 把周末过成一场小旅行</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #111418;
+      --paper: #f5f1e9;
+      --paper-2: #ebe6db;
+      --muted: #77766f;
+      --line: #d8d2c7;
+      --accent: #d8ff54;
+      --accent-2: #f26a4f;
+      --blue: #a8d7ff;
+      --dark: #0e1115;
+      --dark-2: #171b20;
+      --dark-line: #30363d;
+      --dark-muted: #93989f;
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Noto Sans SC", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, select, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    .mono { font-family: "DM Mono", monospace; letter-spacing: .03em; }
+    .page { max-width: 1480px; margin: 0 auto; padding: 0 42px 34px; }
+
+    .topbar {
+      height: 90px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--line); gap: 26px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: max-content; }
+    .brand-mark { width: 33px; height: 33px; border: 2px solid var(--ink); display: grid; place-items: center; transform: rotate(-8deg); font-size: 18px; font-weight: 900; }
+    .brand-name { font-size: 15px; line-height: 1.05; font-weight: 900; letter-spacing: .03em; }
+    .brand-name span { display: block; color: var(--muted); font-size: 10px; font-weight: 500; letter-spacing: .12em; margin-top: 5px; }
+    .nav { display: flex; align-items: center; gap: 5px; color: #686963; font-size: 13px; }
+    .nav a { padding: 9px 13px; border-radius: 999px; transition: .2s; }
+    .nav a:hover, .nav a.active { color: var(--ink); background: var(--paper-2); }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .date-stamp { color: var(--muted); font-size: 11px; text-align: right; line-height: 1.35; }
+    .date-stamp strong { display: block; color: var(--ink); font-size: 12px; font-weight: 500; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; color: var(--paper); background: var(--ink); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+
+    .hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(290px, .7fr); gap: 44px; padding: 63px 0 50px; align-items: end; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .08em; }
+    .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); display: inline-block; }
+    h1 { font-size: clamp(42px, 6.5vw, 88px); line-height: .99; letter-spacing: -.07em; max-width: 820px; margin: 22px 0 24px; font-weight: 900; }
+    h1 em { font-style: normal; color: var(--accent-2); }
+    .hero-lede { max-width: 530px; color: #5f615e; line-height: 1.8; font-size: 14px; margin: 0; }
+    .hero-aside { border-left: 1px solid var(--line); padding-left: 28px; padding-bottom: 5px; }
+    .city-picker { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--ink); padding-bottom: 13px; margin-bottom: 18px; }
+    .city-picker label { font-size: 12px; color: var(--muted); }
+    .city-picker select { border: 0; background: transparent; font-size: 19px; font-weight: 700; color: var(--ink); outline: none; }
+    .weather-line { display: flex; justify-content: space-between; align-items: center; }
+    .weather-main { display: flex; align-items: center; gap: 12px; }
+    .weather-icon { font-size: 34px; filter: saturate(.8); }
+    .temperature { font-size: 37px; font-weight: 700; letter-spacing: -.08em; }
+    .weather-copy { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .weather-copy strong { display: block; color: var(--ink); font-size: 14px; font-weight: 500; }
+    .comfort { color: var(--ink); background: var(--accent); padding: 7px 10px; font-size: 11px; font-weight: 700; }
+
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--line); padding: 18px 0 22px; }
+    .toolbar-label { font-size: 12px; color: var(--muted); margin-right: 4px; }
+    .filter { border: 1px solid var(--line); background: transparent; color: #666861; padding: 9px 16px; font-size: 12px; border-radius: 999px; transition: .2s; }
+    .filter:hover, .filter.selected { color: var(--ink); border-color: var(--ink); background: var(--ink); color: var(--paper); }
+    .filter.selected::before { content: "●"; color: var(--accent); margin-right: 7px; font-size: 8px; vertical-align: 1px; }
+    .result-count { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, .5fr); gap: 28px; align-items: start; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; margin: 3px 0 16px; }
+    .section-kicker { color: var(--accent-2); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    h2 { font-size: 24px; letter-spacing: -.04em; margin: 5px 0 0; font-weight: 900; }
+    .section-head a { color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--muted); padding-bottom: 3px; }
+    .event-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .event-card { background: var(--dark); color: var(--paper); border-radius: var(--radius); overflow: hidden; position: relative; min-height: 337px; display: flex; flex-direction: column; justify-content: space-between; background-size: cover; background-position: center; isolation: isolate; transition: transform .25s, box-shadow .25s; }
+    .event-card::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,17,21,.04) 5%, rgba(14,17,21,.1) 32%, rgba(14,17,21,.95) 100%); z-index: -1; }
+    .event-card:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(14,17,21,.17); }
+    .event-card.large { grid-row: span 2; min-height: 690px; }
+    .event-card.hidden { display: none; }
+    .event-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 18px; }
+    .event-type { background: var(--paper); color: var(--ink); padding: 7px 9px; font-size: 10px; font-weight: 700; }
+    .save { width: 34px; height: 34px; border: 1px solid rgba(245,241,233,.45); border-radius: 50%; background: rgba(14,17,21,.15); color: var(--paper); font-size: 19px; line-height: 1; transition: .2s; }
+    .save:hover, .save.saved { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+    .event-body { padding: 18px; }
+    .match { color: var(--accent); font-size: 11px; font-weight: 700; margin-bottom: 7px; }
+    .event-title { margin: 0; font-size: clamp(20px, 2.4vw, 30px); line-height: 1.1; letter-spacing: -.05em; font-weight: 900; max-width: 460px; }
+    .event-meta { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0 17px; font-size: 11px; color: #cbc9c2; }
+    .event-meta span { display: inline-flex; align-items: center; gap: 5px; }
+    .event-meta b { color: var(--paper); font-weight: 500; }
+    .event-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { color: #aeb3b0; font-size: 10px; padding: 4px 7px; border: 1px solid rgba(245,241,233,.22); border-radius: 99px; }
+    .arrow-btn { background: var(--accent); color: var(--ink); border: 0; border-radius: 50%; width: 38px; height: 38px; font-size: 18px; font-weight: 700; flex: 0 0 auto; transition: .2s; }
+    .arrow-btn:hover { transform: rotate(-45deg); }
+    .card-action { background: transparent; border: 0; color: var(--paper); font-size: 11px; padding: 0; border-bottom: 1px solid rgba(245,241,233,.6); }
+    .card-action:hover { color: var(--accent); border-color: var(--accent); }
+
+    .side-stack { display: flex; flex-direction: column; gap: 25px; }
+    .side-panel { border-top: 2px solid var(--ink); padding-top: 12px; }
+    .side-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+    .side-head h3 { font-size: 17px; margin: 0; letter-spacing: -.03em; font-weight: 900; }
+    .side-head span { font-size: 10px; color: var(--muted); }
+    .forecast { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .forecast-day { background: var(--paper-2); padding: 10px 7px 11px; min-height: 88px; text-align: center; }
+    .forecast-day:first-child { color: var(--ink); background: var(--accent); }
+    .forecast-day time { display: block; font-size: 10px; color: inherit; opacity: .68; margin-bottom: 9px; }
+    .forecast-day .mini-weather { display: block; font-size: 17px; margin-bottom: 7px; }
+    .forecast-day strong { font-size: 12px; font-weight: 500; }
+    .forecast-caption { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-top: 12px; }
+
+    .crew-list { border-bottom: 1px solid var(--line); }
+    .crew { display: flex; gap: 11px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+    .crew-face { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; flex: 0 0 auto; }
+    .face-a { background: #f2b7a9; } .face-b { background: #c8c3ff; } .face-c { background: #b6e4c7; }
+    .crew-copy { min-width: 0; flex: 1; }
+    .crew-copy strong { display: block; font-size: 12px; font-weight: 700; }
+    .crew-copy span { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+    .join-btn { border: 1px solid var(--ink); background: transparent; padding: 7px 9px; font-size: 10px; white-space: nowrap; transition: .2s; }
+    .join-btn:hover, .join-btn.joined { background: var(--ink); color: var(--paper); }
+
+    .map-panel { background: var(--dark); color: var(--paper); border-radius: var(--radius); padding: 18px; min-height: 244px; position: relative; overflow: hidden; }
+    .map-panel::before { content: ""; position: absolute; inset: 0; opacity: .16; background-image: linear-gradient(105deg, transparent 48%, #a4abb1 49%, transparent 50%), linear-gradient(18deg, transparent 47%, #a4abb1 48%, transparent 50%), linear-gradient(78deg, transparent 48%, #a4abb1 49%, transparent 50%); background-size: 85px 50px, 110px 80px, 70px 90px; transform: rotate(-12deg) scale(1.4); }
+    .map-title { position: relative; z-index: 1; font-size: 17px; font-weight: 900; letter-spacing: -.03em; }
+    .map-subtitle { position: relative; z-index: 1; font-size: 11px; color: var(--dark-muted); margin-top: 4px; }
+    .map-pin { position: absolute; z-index: 2; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 6px rgba(216,255,84,.14); }
+    .map-pin::after { content: attr(data-place); position: absolute; left: 18px; top: -5px; font-size: 10px; color: var(--paper); white-space: nowrap; }
+    .pin-1 { top: 84px; left: 38%; } .pin-2 { top: 135px; left: 64%; background: var(--accent-2); box-shadow: 0 0 0 6px rgba(242,106,79,.14); } .pin-3 { top: 174px; left: 23%; }
+    .map-legend { position: absolute; left: 18px; bottom: 16px; display: flex; align-items: center; gap: 6px; color: var(--dark-muted); font-size: 10px; }
+    .map-legend i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: var(--accent); }
+
+    .bottom-band { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 28px; }
+    .manifesto, .share-card { min-height: 155px; padding: 24px; }
+    .manifesto { background: var(--accent); }
+    .share-card { background: var(--ink); color: var(--paper); display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+    .band-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; opacity: .7; }
+    .band-copy { font-size: 20px; font-weight: 900; letter-spacing: -.05em; line-height: 1.25; margin-top: 15px; max-width: 380px; }
+    .share-card .band-copy { font-size: 18px; }
+    .share-action { flex: 0 0 auto; border: 1px solid var(--accent); background: var(--accent); color: var(--ink); padding: 11px 14px; font-size: 11px; font-weight: 700; }
+    .share-action:hover { background: transparent; color: var(--accent); }
+
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 10; background: var(--ink); color: var(--paper); padding: 13px 17px; font-size: 12px; transform: translateY(18px); opacity: 0; pointer-events: none; transition: .25s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(14,17,21,.72); display: none; place-items: center; padding: 20px; }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: min(460px, 100%); background: var(--paper); padding: 28px; position: relative; }
+    .modal-close { position: absolute; right: 18px; top: 15px; border: 0; background: transparent; font-size: 22px; }
+    .modal h3 { margin: 0 28px 7px 0; font-size: 24px; letter-spacing: -.05em; }
+    .modal p { margin: 0 0 22px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .modal-field { display: block; margin-bottom: 12px; }
+    .modal-field span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+    .modal-field input { width: 100%; border: 1px solid var(--line); background: transparent; padding: 11px; outline-color: var(--accent-2); }
+    .modal-submit { width: 100%; background: var(--ink); color: var(--paper); border: 0; padding: 13px; margin-top: 8px; font-size: 12px; font-weight: 700; }
+
+    @media (max-width: 960px) {
+      .page { padding: 0 24px 28px; }
+      .hero { gap: 28px; }
+      .content-grid { grid-template-columns: 1fr; }
+      .side-stack { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+      .map-panel { grid-column: span 2; }
+    }
+    @media (max-width: 650px) {
+      .page { padding: 0 16px 22px; }
+      .topbar { height: 70px; }
+      .nav { display: none; }
+      .date-stamp { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 26px; padding: 42px 0 33px; }
+      .hero-aside { border-left: 0; border-top: 1px solid var(--line); padding: 22px 0 0; }
+      h1 { font-size: clamp(42px, 13vw, 67px); }
+      .toolbar { gap: 8px; }
+      .result-count { width: 100%; margin: 4px 0 0; }
+      .event-grid { grid-template-columns: 1fr; }
+      .event-card.large { grid-row: auto; min-height: 430px; }
+      .event-card { min-height: 300px; }
+      .side-stack { display: flex; }
+      .map-panel { min-height: 220px; }
+      .bottom-band { grid-template-columns: 1fr; }
+      .share-card { min-height: 140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="城市漫游首页">
+        <span class="brand-mark">↗</span>
+        <span class="brand-name">城市漫游<span>WEEKEND CITY GUIDE</span></span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a class="active" href="#explore">探索</a>
+        <a href="#weather">天气</a>
+        <a href="#crew">组队</a>
+        <a href="#saved">我的收藏 <span id="savedCount">0</span></a>
+      </nav>
+      <div class="top-actions">
+        <div class="date-stamp"><strong>周六 · 09.20</strong>北京 / 朝阳区</div>
+        <div class="avatar" aria-label="用户头像">F</div>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="pageTitle">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> 给周末一点意外的方向</div>
+          <h1 id="pageTitle">这个周末，<br />去城市的<em>另一面。</em></h1>
+          <p class="hero-lede">把天气、预算和心情交给我们。展览、市集、演出和城市漫步，今天的北京有很多种打开方式。</p>
+        </div>
+        <div class="hero-aside" aria-label="当前天气与城市选择">
+          <div class="city-picker">
+            <label for="citySelect">正在探索</label>
+            <select id="citySelect" aria-label="选择城市">
+              <option>北京 · BEIJING</option>
+              <option>上海 · SHANGHAI</option>
+              <option>广州 · GUANGZHOU</option>
+              <option>成都 · CHENGDU</option>
+            </select>
+          </div>
+          <div class="weather-line">
+            <div class="weather-main"><span class="weather-icon" aria-hidden="true">☀</span><span class="temperature">24°</span><span class="weather-copy"><strong>晴朗，微风</strong>适合户外活动</span></div>
+            <span class="comfort">体感舒适</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="toolbar" id="explore" aria-label="活动筛选">
+        <span class="toolbar-label">我想去</span>
+        <button class="filter selected" type="button" data-filter="all">全部</button>
+        <button class="filter" type="button" data-filter="展览">看展</button>
+        <button class="filter" type="button" data-filter="市集">逛市集</button>
+        <button class="filter" type="button" data-filter="演出">看演出</button>
+        <button class="filter" type="button" data-filter="户外">去户外</button>
+        <span class="result-count" id="resultCount" aria-live="polite">为你精选 06 场活动</span>
+      </section>
+
+      <div class="content-grid">
+        <section aria-labelledby="recommendTitle">
+          <div class="section-head">
+            <div><div class="section-kicker mono">CURATED FOR YOU</div><h2 id="recommendTitle">本周末值得出发</h2></div>
+            <a href="#all-events" id="allEventsLink">查看全部 ↗</a>
+          </div>
+          <div class="event-grid" id="eventGrid">
+            <article class="event-card large" data-category="户外" style="background-image: url('https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=85')">
+              <div class="event-top"><span class="event-type">城市漫步 · 朝阳</span><button class="save" type="button" aria-label="收藏798艺术区夜游" aria-pressed="false">♡</button></div>
+              <div class="event-body"><div class="match">98% MATCH · 晴天推荐</div><h3 class="event-title">798 艺术区夜游<br />和一场露台电影</h3><div class="event-meta"><span>◷ <b>17:30 — 22:00</b></span><span>¥ <b>0 — 88</b></span></div><div class="event-bottom"><div class="tags"><span class="tag">独自友好</span><span class="tag">拍照出片</span></div><button class="card-action check-in" type="button" aria-label="打卡798艺术区夜游">打卡</button><button class="arrow-btn" type="button" aria-label="查看798艺术区夜游详情">↗</button></div></div>
+            </article>
+            <article class="event-card" data-category="市集" style="background-image: url('https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=1000&q=85')">
+              <div class="event-top"><span class="event-type">市集 · 东城</span><button class="save" type="button" aria-label="收藏胡同植物市集" aria-pressed="false">♡</button></div>
+              <div class="event-body"><div class="match">92% MATCH · 预算友好</div><h3 class="event-title">胡同植物<br />交换市集</h3><div class="event-meta"><span>◷ <b>10:00 — 18:00</b></span><span>¥ <b>0 — 35</b></span></div><div class="event-bottom"><div class="tags"><span class="tag">可带宠物</span></div><button class="card-action check-in" type="button" aria-label="打卡胡同植物市集">打卡</button><button class="arrow-btn" type="button" aria-label="查看胡同植物市集详情">↗</button></div></div>
+            </article>
+            <article class="event-card" data-category="演出" style="background-image: url('https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1000&q=85')">
+              <div class="event-top"><span class="event-type">现场 · 海淀</span><button class="save" type="button" aria-label="收藏独立乐队现场" aria-pressed="false">♡</button></div>
+              <div class="event-body"><div class="match">87% MATCH · 今晚</div><h3 class="event-title">草地上的<br />独立乐队现场</h3><div class="event-meta"><span>◷ <b>19:00 — 21:30</b></span><span>¥ <b>128</b></span></div><div class="event-bottom"><div class="tags"><span class="tag">适合组队</span></div><button class="card-action check-in" type="button" aria-label="打卡独立乐队现场">打卡</button><button class="arrow-btn" type="button" aria-label="查看独立乐队现场详情">↗</button></div></div>
+            </article>
+            <article class="event-card" data-category="展览" style="background-image: url('https://images.unsplash.com/photo-1561214115-f2f134cc4912?auto=format&fit=crop&w=1000&q=85')">
+              <div class="event-top"><span class="event-type">展览 · 西城</span><button class="save" type="button" aria-label="收藏光的容器展览" aria-pressed="false">♡</button></div>
+              <div class="event-body"><div class="match">85% MATCH · 室内避雨</div><h3 class="event-title">光的容器<br />当代艺术群展</h3><div class="event-meta"><span>◷ <b>09:30 — 17:00</b></span><span>¥ <b>68</b></span></div><div class="event-bottom"><div class="tags"><span class="tag">雨天备选</span></div><button class="card-action check-in" type="button" aria-label="打卡光的容器展览">打卡</button><button class="arrow-btn" type="button" aria-label="查看光的容器展览详情">↗</button></div></div>
+            </article>
+            <article class="event-card" data-category="户外" style="background-image: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1000&q=85')">
+              <div class="event-top"><span class="event-type">徒步 · 门头沟</span><button class="save" type="button" aria-label="收藏西山轻徒步" aria-pressed="false">♡</button></div>
+              <div class="event-body"><div class="match">81% MATCH · 周日出发</div><h3 class="event-title">西山轻徒步<br />溪边野餐计划</h3><div class="event-meta"><span>◷ <b>08:00 — 15:00</b></span><span>¥ <b>79</b></span></div><div class="event-bottom"><div class="tags"><span class="tag">需提前报名</span></div><button class="card-action check-in" type="button" aria-label="打卡西山轻徒步">打卡</button><button class="arrow-btn" type="button" aria-label="查看西山轻徒步详情">↗</button></div></div>
+            </article>
+            <article class="event-card" data-category="市集" style="background-image: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1000&q=85')">
+              <div class="event-top"><span class="event-type">夜市 · 朝阳</span><button class="save" type="button" aria-label="收藏午夜食堂" aria-pressed="false">♡</button></div>
+              <div class="event-body"><div class="match">79% MATCH · 深夜快乐</div><h3 class="event-title">午夜食堂<br />深夜风物档案</h3><div class="event-meta"><span>◷ <b>18:00 — 01:00</b></span><span>¥ <b>100</b></span></div><div class="event-bottom"><div class="tags"><span class="tag">一个人也行</span></div><button class="card-action check-in" type="button" aria-label="打卡午夜食堂">打卡</button><button class="arrow-btn" type="button" aria-label="查看午夜食堂详情">↗</button></div></div>
+            </article>
+          </div>
+          <div id="all-events" aria-hidden="true"></div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="side-panel" id="weather" aria-labelledby="weatherTitle">
+            <div class="side-head"><h3 id="weatherTitle">周末天气预报</h3><span class="mono">09.20 — 09.21</span></div>
+            <div class="forecast">
+              <div class="forecast-day"><time>周六</time><span class="mini-weather">☀</span><strong>24° / 15°</strong></div>
+              <div class="forecast-day"><time>周日</time><span class="mini-weather">☼</span><strong>22° / 14°</strong></div>
+              <div class="forecast-day"><time>周一</time><span class="mini-weather">☁</span><strong>20° / 13°</strong></div>
+              <div class="forecast-day"><time>周二</time><span class="mini-weather">☂</span><strong>18° / 12°</strong></div>
+            </div>
+            <div class="forecast-caption"><span>紫外线 3 / 中等</span><span>降雨概率 10%</span></div>
+          </section>
+
+          <section class="side-panel" id="crew" aria-labelledby="crewTitle">
+            <div class="side-head"><h3 id="crewTitle">正在发起组队</h3><span>附近 12 个小队</span></div>
+            <div class="crew-list">
+              <div class="crew"><div class="crew-face face-a">M</div><div class="crew-copy"><strong>Momo 的周六看展局</strong><span>光的容器 · 还差 2 人</span></div><button class="join-btn" type="button">加入</button></div>
+              <div class="crew"><div class="crew-face face-b">L</div><div class="crew-copy"><strong>下班去听歌</strong><span>草地现场 · 还差 3 人</span></div><button class="join-btn" type="button">加入</button></div>
+              <div class="crew"><div class="crew-face face-c">K</div><div class="crew-copy"><strong>周日山里见</strong><span>西山徒步 · 还差 1 人</span></div><button class="join-btn" type="button">加入</button></div>
+            </div>
+          </section>
+
+          <section class="map-panel" aria-label="北京活动地图">
+            <div class="map-title">附近的灵感</div><div class="map-subtitle">3 个活动正在发生</div>
+            <span class="map-pin pin-1" data-place="798 艺术区"></span><span class="map-pin pin-2" data-place="胡同市集"></span><span class="map-pin pin-3" data-place="西山"></span>
+            <div class="map-legend"><i></i> 根据你的偏好标记</div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="bottom-band" id="saved">
+        <div class="manifesto"><div class="band-label mono">WEEKEND NOTE / 01</div><div class="band-copy">不需要远行，城市本身就是目的地。</div></div>
+        <div class="share-card"><div><div class="band-label mono">SHARE YOUR FINDS</div><div class="band-copy">有私藏路线？<br />和同频的人分享。</div></div><button class="share-action" id="shareBtn" type="button">发布攻略 ↗</button></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <button class="modal-close" id="modalClose" type="button" aria-label="关闭">×</button>
+      <h3 id="modalTitle">发起一场小小出发</h3>
+      <p>把你的周末路线写下来，邀请同频的人一起走。攻略会出现在城市漫游的灵感墙上。</p>
+      <label class="modal-field"><span>路线标题</span><input id="routeTitle" type="text" placeholder="例如：周六下午的胡同散步" /></label>
+      <label class="modal-field"><span>想去哪里</span><input id="routePlace" type="text" placeholder="例如：五道营 → 雍和宫 → 鼓楼" /></label>
+      <button class="modal-submit" id="modalSubmit" type="button">发布我的攻略</button>
+    </div>
+  </div>
+
+  <script>
+    const root = document;
+    const filters = [...root.querySelectorAll('.filter')];
+    const cards = [...root.querySelectorAll('.event-card')];
+    const resultCount = root.getElementById('resultCount');
+    const savedCount = root.getElementById('savedCount');
+    const toast = root.getElementById('toast');
+    const modalBackdrop = root.getElementById('modalBackdrop');
+    let saved = 0;
+    let toastTimer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    filters.forEach((filter) => filter.addEventListener('click', () => {
+      filters.forEach((item) => item.classList.remove('selected'));
+      filter.classList.add('selected');
+      const selected = filter.dataset.filter;
+      let visible = 0;
+      cards.forEach((card) => {
+        const isVisible = selected === 'all' || card.dataset.category === selected;
+        card.classList.toggle('hidden', !isVisible);
+        if (isVisible) visible += 1;
+      });
+      resultCount.textContent = `为你精选 ${String(visible).padStart(2, '0')} 场活动`;
+    }));
+
+    root.querySelectorAll('.save').forEach((button) => button.addEventListener('click', () => {
+      const isSaved = button.classList.toggle('saved');
+      button.setAttribute('aria-pressed', String(isSaved));
+      button.textContent = isSaved ? '♥' : '♡';
+      saved += isSaved ? 1 : -1;
+      savedCount.textContent = saved;
+      showToast(isSaved ? '已收藏，周末见。' : '已从收藏中移除');
+    }));
+
+    root.querySelectorAll('.join-btn').forEach((button) => button.addEventListener('click', () => {
+      const joined = button.classList.toggle('joined');
+      button.textContent = joined ? '已加入' : '加入';
+      showToast(joined ? '已加入小队，去认识新朋友吧。' : '已退出这个小队');
+    }));
+
+    root.querySelectorAll('.arrow-btn').forEach((button) => button.addEventListener('click', () => showToast('活动详情已记录，出发前记得确认时间。')));
+    root.querySelectorAll('.check-in').forEach((button) => button.addEventListener('click', () => {
+      button.textContent = '已打卡';
+      button.disabled = true;
+      showToast('打卡成功，已加入你的周末足迹。');
+    }));
+    root.getElementById('citySelect').addEventListener('change', (event) => showToast(`已切换到 ${event.target.value.split(' · ')[0]}，为你重新整理活动。`));
+
+    const openModal = () => { modalBackdrop.classList.add('open'); root.getElementById('routeTitle').focus(); };
+    const closeModal = () => modalBackdrop.classList.remove('open');
+    root.getElementById('shareBtn').addEventListener('click', openModal);
+    root.getElementById('modalClose').addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', (event) => { if (event.target === modalBackdrop) closeModal(); });
+    root.getElementById('modalSubmit').addEventListener('click', () => {
+      const title = root.getElementById('routeTitle').value.trim();
+      const place = root.getElementById('routePlace').value.trim();
+      if (!title || !place) { showToast('请先补充路线标题和地点'); return; }
+      closeModal();
+      showToast('攻略发布成功，等同频的人来发现。');
+      root.getElementById('routeTitle').value = '';
+      root.getElementById('routePlace').value = '';
+    });
+    root.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });
+  </script>
+</body>
+</html>
